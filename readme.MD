@@ -9,6 +9,9 @@
 7. Caso a requisição não seja feita com sucesso retornar status 400.
 8. Criar retorno de consulta, que irá retornar 200 caso encontre o registro, ou 404, caso não encoontre.
 
+## Passos realizados
+1. Criado os pacotes. dentro de src/main/java (Model, controller, service)
+
 
 
 
