@@ -18,13 +18,13 @@ import java.time.LocalDate;
 public class Pessoa {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(nullable = false)
     private String nome;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
-    @Column(unique = true)
+    @Column(unique = true, length = 11, updatable = false)
     private String cpf;
     @Column(nullable = false)
     private LocalDate dtNascimento;

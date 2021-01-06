@@ -18,9 +18,6 @@ public class PessoaService {
        return repository.save(pessoa);
     }
 
-    public List<Pessoa> cadastrarPessoas(List<Pessoa> pessoas){
-        return repository.saveAll(pessoas);
-    }
 
     public List<Pessoa> listarPessoas(){
         return repository.findAll();

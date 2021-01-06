@@ -19,28 +19,20 @@ public class PessoaController {
         return  service.cadastrarPessoa(pessoa);
 
     }
-    @PostMapping("/pessoas")
-    public List<Pessoa> adicionarPessoas(@RequestBody List<Pessoa> pessoas){
-        return  service.cadastrarPessoas(pessoas);
-
-    }
 
     @GetMapping("/pessoas")
     public List<Pessoa> listarPessoas(){
         return service.listarPessoas();
     }
-    @GetMapping("/pessoas/{id}")
+    @GetMapping("/pessoaId/{id}")
     public Pessoa listarPessoaId(@PathVariable int id){
         return service.listarPessoaId(id);
     }
-    @GetMapping("/pessoas/{cpf}")
+    @GetMapping("/pessoaCPF/{cpf}")
     public Pessoa listarPessoaCpf(@PathVariable String cpf){
         return service.listarPessoaCPF(cpf);
     }
-    @GetMapping("/pessoas/{nome}")
-    public Pessoa listarPessoaNome(@PathVariable String nome){
-        return service.listarPessoaNome(nome);
-    }
+
 
     @PutMapping("/atualizar")
     public Pessoa atualizarPessoa(@RequestBody Pessoa pessoa) {
