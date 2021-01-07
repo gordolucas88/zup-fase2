@@ -1,11 +1,13 @@
 package com.zup.orangeTalents.service;
 
 
+import com.zup.orangeTalents.dto.PessoaDto;
 import com.zup.orangeTalents.entity.Pessoa;
 import com.zup.orangeTalents.repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Service
@@ -23,7 +25,7 @@ public class PessoaService {
         return repository.findAll();
     }
 
-    public Pessoa listarPessoaId(int id){
+    public Pessoa listarPessoaId(Long id){
         return repository.findById(id).orElse(  null);
     }
 
@@ -35,7 +37,7 @@ public class PessoaService {
         return repository.findByNome(nome);
     }
 
-    public String excluirPessoa(int id){
+    public String excluirPessoa(Long id){
         repository.deleteById(id);
         return "Cadastro Excluido: " + id;
     }
