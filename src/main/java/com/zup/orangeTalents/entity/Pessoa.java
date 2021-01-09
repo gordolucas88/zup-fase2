@@ -1,13 +1,13 @@
 package com.zup.orangeTalents.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.lang.NonNull;
+        import lombok.AllArgsConstructor;
+        import lombok.Data;
+        import lombok.NoArgsConstructor;
+        import org.springframework.context.annotation.Primary;
+        import org.springframework.lang.NonNull;
 
-import javax.persistence.*;
-import java.time.LocalDate;
+        import javax.persistence.*;
+        import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor

@@ -41,27 +41,32 @@ public class PessoaController {
     }
 
     @GetMapping("/pessoas")
-    public List<Pessoa> listarPessoas(){
-        return service.listarPessoas();
+    public ResponseEntity<List<Pessoa>> listarPessoas(){
+
+        return ResponseEntity.ok().body(service.listarPessoas());
     }
+
     @GetMapping("/pessoaId/{id}")
-    public ResponseEntity<Pessoa> listarPessoaId(@PathVariable Long id){
-        Pessoa pessoa = service.listarPessoaId(id);
-        if(pessoa == null){
+    public ResponseEntity<Pessoa> listarPessoaId(@PathVariable("id") Long id){
+        try {
+            return ResponseEntity.ok().body(service.listarPessoaId(id));
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(pessoa);
     }
     @GetMapping("/pessoaCPF/{cpf}")
-    public ResponseEntity<Pessoa> listarPessoaCpf(@PathVariable String cpf){
-        Pessoa pessoa = service.listarPessoaCPF(cpf);
-        if(pessoa == null){
+    public ResponseEntity<Pessoa> listarPessoaCpf(@PathVariable("cpf") String cpf) {
+
+        try {
+           return ResponseEntity.ok().body(service.listarPessoaCPF(cpf));
+
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(pessoa);
     }
+
 
 
     @PutMapping("/atualizar")
@@ -78,7 +83,7 @@ public class PessoaController {
 
 
     @DeleteMapping("/excluir/{id}")
-    public  ResponseEntity<String> excluirPessoa(@PathVariable Long id) {
+    public  ResponseEntity<String> excluirPessoa(@PathVariable("id") Long id) {
 
         try {
             service.excluirPessoa(id);

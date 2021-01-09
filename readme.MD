@@ -9,6 +9,20 @@
 3. Caso os dados fornecidos forem validados com sucesso, efetuar o devido cadastro na base de dados. 
 4. Caso os dados fornecidos não passarem na validação devolver a resposta para o solicitante.
 
+## Decisões
+
+* Nesse Projeto vamos utilizar o padrão de Projeto MVC(Model-View-Controller). Apesar de ser um dos padrões de projetos mais utilizados, ele vai suprir bastante as nossas necessidades.
+* Para todas as nossa validações de dados usaremos depêndendencias do Spring.
+
+#### Benefícios:
+
+* Ajuda consideravelmente a manutenção do nosso código. Pois temos as responsibildades claramente separadas.
+* Amplamente utilizado, então outras pessoas irão conseguir entender o padrão do nosso projeto.
+
+### Pontos negativos:
+
+* Apesar de pesquisar muito, realmente não encontrei um maléficio no uso desse design pattern.
+
 ## Procedimentos
 
 O primeiro passo para começar a construir é acessar o site: https://start.spring.io/
@@ -168,16 +182,13 @@ public class PessoaService {
         return repository.findAll();
     }
 
-    public Pessoa listarPessoaId(Long id){
-        return repository.findById(id).orElse(  null);
+    public Pessoa listarPessoaId(Long id) throws Exception {
+
+        return repository.findById(id).orElseThrow(Exception::new);
     }
 
-    public Pessoa listarPessoaCPF(String cpf){
-        return repository.findByCpf(cpf);
-    }
-
-    public Pessoa listarPessoaNome(String nome){
-        return repository.findByNome(nome);
+    public Pessoa listarPessoaCPF(String cpf) throws Exception {
+        return repository.findByCpf(cpf).orElseThrow(Exception::new);
     }
 
     public String excluirPessoa(Long id){
@@ -197,17 +208,16 @@ public class PessoaService {
 ```
 
 * **@Service:** Marcamos a classe com essa anotação para o Spring saber que dentro dela irá conter nossa lógica de negócio.
-* **@AutoWired:** Marcamos isso no nosso construtor para ele se tornar um ponto de injeção de dependência.
+* **@AutoWired:** Marcamos isso no nosso construtor para ele se tornar um ponto de injeção de dependência aonde "PessoaService" Necessita que "PessoaRepository" esteja instânciada.
 
 Apartir desse momento começamos a realmente implementar as regras de negócio.
 
 1. O primeiro metódo "cadastrarPessoa", recebe uma "Pessoa" e então utilizamos o metódo "save" do nosso repositório, que basicamente cria um insert do registro no banco de dados. ,
 1. O segundo metódo "listarPessoas", retorna o resultado do metódo "findAll", basicamente um array com todas as Pessoas cadastradas em nossa tabela.
-1. O terceiro metódo "listarPessoaId", recebe um "id" como parâmetro e então retorna a "Pessoa" que tem esse "id" através do metódo "findById".
-1. O quarto metódo "listarPessoaCPF", recebe uma string (que seria o cpf), e retorna a "Pessoa" que tem esse cpf através do metódo "findByCpf".
-1. O quinto metódo "listarPessoaNome", recebe uma string (que seria o nome), e retorna a "Pessoa" que tem esse nome através do metódo "findByNome".
-1. O sexto metódo "excluirPessoa", recebe um id, e exclui a "Pessoa" que tem esse esse Id através do metódo "deleteById" e retorna a mensagem de sucesso e o id excluído.
-1. O sétimo e ultimo metódo "atualizarPessoa", recebe uma "Pessoa", e então atualiza os campos: nome e data de nascimento, na nossa regra não é possível alterar o e-mail ou cpf.
+1. O terceiro metódo "listarPessoaId", recebe um "id" como parâmetro e então retorna a "Pessoa" que tem esse "id" através do metódo "findById". Caso o Id não exista então retornamos uma exceção.
+1. O quarto metódo "listarPessoaCPF", recebe uma string (que seria o cpf), e retorna a "Pessoa" que tem esse cpf através do metódo "findByCpf". Caso o CPF não exista então retornamos uma exceção.
+1. O quinto metódo "excluirPessoa", recebe um id, e exclui a "Pessoa" que tem esse esse Id através do metódo "deleteById" e retorna a mensagem de sucesso e o id excluído.
+1. O sexto e ultimo metódo "atualizarPessoa", recebe uma "Pessoa", e então atualiza os campos: nome e data de nascimento, na nossa regra não é possível alterar o e-mail ou cpf.
 
 ### PessoaRepository
 
@@ -215,14 +225,14 @@ Essa é a única interface da nossa aplicação, a função dela é prover os me
 
 ```
 public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
-    Pessoa findByNome(String name);
-    Pessoa findByCpf(String cpf);
+    Optional<Pessoa> findByCpf(String cpf);
 }
 ```
 
 * Como mostrado acima, ela é bem simples, a nossa interface PessoaRepository, herda as funcionalidades do JpaRepository, dessa maneira já temos todas as funcionalidades básicas de CRUD(Criar, Ler, Atualizar e Deletar ) da nossa aplicação.
 * Informamos que "JpaRepository" é um "Generics" de Pessoa.
 * Criamos o metódo de busca por nome e cpf, visto que não são campos identificadores, e como queremos realizar buscas através deles, precisamos criar os seus devidos metódos.
+* Temos que adicionar a "Flag" Optional, porquê a consulta pode não retornar nenhum CPF(Caso o cpf solicitado não esteja cadastrado).
 
 ### PessoaController
 
@@ -257,29 +267,31 @@ public class PessoaController {
     }
 
     @GetMapping("/pessoas")
-    public List<Pessoa> listarPessoas(){
-        return service.listarPessoas();
+    public ResponseEntity<List<Pessoa>> listarPessoas(){
+
+        return ResponseEntity.ok().body(service.listarPessoas());
     }
-    
+
     @GetMapping("/pessoaId/{id}")
-    public ResponseEntity<Pessoa> listarPessoaId(@PathVariable Long id){
-        Pessoa pessoa = service.listarPessoaId(id);
-        if(pessoa == null){
+    public ResponseEntity<Pessoa> listarPessoaId(@PathVariable("id") Long id){
+        try {
+            return ResponseEntity.ok().body(service.listarPessoaId(id));
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(pessoa);
     }
     @GetMapping("/pessoaCPF/{cpf}")
-    public ResponseEntity<Pessoa> listarPessoaCpf(@PathVariable String cpf){
-        Pessoa pessoa = service.listarPessoaCPF(cpf);
-        if(pessoa == null){
+    public ResponseEntity<Pessoa> listarPessoaCpf(@PathVariable("cpf") String cpf) {
+
+        try {
+           return ResponseEntity.ok().body(service.listarPessoaCPF(cpf));
+
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(pessoa);
     }
-
 
     @PutMapping("/atualizar")
     public ResponseEntity<Pessoa> atualizarPessoa(@RequestBody Pessoa pessoa) {
@@ -293,9 +305,8 @@ public class PessoaController {
 
     }
 
-
     @DeleteMapping("/excluir/{id}")
-    public  ResponseEntity<String> excluirPessoa(@PathVariable Long id) {
+    public  ResponseEntity<String> excluirPessoa(@PathVariable("id") Long id) {
 
         try {
             service.excluirPessoa(id);
@@ -304,18 +315,14 @@ public class PessoaController {
             return ResponseEntity.notFound().build();
         }
 
-
-
     }
-
-
-
 }
+
 
 ```
 
 * **@RestController:** É uma anotação do framework Spring, ela marca que a classe é um controller, tipo "REST", com isso já implementa outros componentes como @ResponseBody e @RequestMapping, que utilizamos logo abaixo.
-* **@AutoWired:** Marcamos isso no nosso construtor para ele se tornar um ponto de injeção de dependência, também é uma anotação do Spring.
+* **@AutoWired:** Marcamos isso no nosso construtor para ele se tornar um ponto de injeção de dependência, também é uma anotação do Spring, nesse caso dizemos que a nossa classe "PessoaCOntroller" precisa de "PessoaService" instânciada.
 
 Abaixo agora vem as nossas Rotas:
 
