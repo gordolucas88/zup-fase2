@@ -1,6 +1,6 @@
 # Orange Talents
 
-*Todo projeto descrito nesse "Guia" se encontra no github e você pode ler, e testar o projeto pelo link: https://github.com/gordolucas88/zup-fase2*
+*Todo projeto descrito nesse "Guia" se encontra no github e você pode ler, e testar o projeto pelo link: https://github.com/lucasrodrigues062/zup-fase2*
 
 ## Caso de uso
 
